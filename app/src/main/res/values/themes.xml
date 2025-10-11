@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Realtopia" parent="Theme.Material3.DayNight">
+        <!-- Customize your light theme here. -->
+        <item name="colorPrimary">@color/game_primary</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorPrimaryContainer">@color/game_primary</item>
+        <item name="colorOnPrimaryContainer">@android:color/white</item>
+        
+        <item name="colorSecondary">@color/game_secondary</item>
+        <item name="colorOnSecondary">@android:color/white</item>
+        <item name="colorSecondaryContainer">@color/game_secondary</item>
+        <item name="colorOnSecondaryContainer">@android:color/white</item>
+        
+        <item name="colorTertiary">@color/game_accent</item>
+        <item name="colorOnTertiary">@android:color/white</item>
+        <item name="colorTertiaryContainer">@color/game_accent</item>
+        <item name="colorOnTertiaryContainer">@android:color/white</item>
+        
+        <item name="colorError">@color/game_error</item>
+        <item name="colorOnError">@android:color/white</item>
+        <item name="colorErrorContainer">@color/game_error</item>
+        <item name="colorOnErrorContainer">@android:color/white</item>
+        
+        <item name="android:colorBackground">@android:color/white</item>
+        <item name="colorOnBackground">@android:color/black</item>
+        <item name="colorSurface">@android:color/white</item>
+        <item name="colorOnSurface">@android:color/black</item>
+        <item name="colorSurfaceVariant">@android:color/white</item>
+        <item name="colorOnSurfaceVariant">@android:color/black</item>
+        
+        <item name="android:statusBarColor">@color/game_primary</item>
+        <item name="android:navigationBarColor">@android:color/white</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        
+        <!-- Hide ActionBar -->
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.Realtopia" parent="Base.Theme.Realtopia" />
+    
+    <!-- Dark theme -->
+    <style name="Base.Theme.Realtopia.Dark" parent="Theme.Material3.DayNight">
+        <item name="colorPrimary">@color/purple_80</item>
+        <item name="colorOnPrimary">@color/purple_40</item>
+        <item name="colorPrimaryContainer">@color/purple_40</item>
+        <item name="colorOnPrimaryContainer">@color/purple_80</item>
+        
+        <item name="colorSecondary">@color/purple_grey_80</item>
+        <item name="colorOnSecondary">@color/purple_grey_40</item>
+        <item name="colorSecondaryContainer">@color/purple_grey_40</item>
+        <item name="colorOnSecondaryContainer">@color/purple_grey_80</item>
+        
+        <item name="colorTertiary">@color/pink_80</item>
+        <item name="colorOnTertiary">@color/pink_40</item>
+        <item name="colorTertiaryContainer">@color/pink_40</item>
+        <item name="colorOnTertiaryContainer">@color/pink_80</item>
+        
+        <item name="colorError">@color/game_error</item>
+        <item name="colorOnError">@android:color/white</item>
+        <item name="colorErrorContainer">@color/game_error</item>
+        <item name="colorOnErrorContainer">@android:color/white</item>
+        
+        <item name="android:colorBackground">@android:color/black</item>
+        <item name="colorOnBackground">@android:color/white</item>
+        <item name="colorSurface">@android:color/black</item>
+        <item name="colorOnSurface">@android:color/white</item>
+        <item name="colorSurfaceVariant">@android:color/black</item>
+        <item name="colorOnSurfaceVariant">@android:color/white</item>
+        
+        <item name="android:statusBarColor">@android:color/black</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        
+        <!-- Hide ActionBar -->
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.Realtopia.Dark" parent="Base.Theme.Realtopia.Dark" />
+    
+    <!-- Game specific themes for different levels -->
+    <style name="Theme.Realtopia.Urban" parent="Theme.Realtopia">
+        <item name="android:colorBackground">@color/urban_background</item>
+    </style>
+    
+    <style name="Theme.Realtopia.Beach" parent="Theme.Realtopia">
+        <item name="android:colorBackground">@color/beach_background</item>
+    </style>
+    
+    <style name="Theme.Realtopia.Mountain" parent="Theme.Realtopia">
+        <item name="android:colorBackground">@color/mountain_background</item>
+    </style>
+    
+    <style name="Theme.Realtopia.Forest" parent="Theme.Realtopia">
+        <item name="android:colorBackground">@color/forest_background</item>
+    </style>
+    
+    <style name="Theme.Realtopia.Desert" parent="Theme.Realtopia">
+        <item name="android:colorBackground">@color/desert_background</item>
+    </style>
+    
+    <!-- Splash screen theme -->
+    <style name="Theme.Realtopia.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/game_primary</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="windowSplashScreenAnimationDuration">300</item>
+        <item name="postSplashScreenTheme">@style/Theme.Realtopia</item>
+    </style>
+    
+    <!-- Dialog themes -->
+    <style name="Theme.Realtopia.Dialog" parent="Theme.Material3.DayNight">
+        <item name="colorPrimary">@color/game_primary</item>
+        <item name="colorSecondary">@color/game_secondary</item>
+        <item name="colorTertiary">@color/game_accent</item>
+    </style>
+    
+    <!-- Notification themes -->
+    <style name="Theme.Realtopia.Notification" parent="Theme.Material3.DayNight">
+        <item name="colorPrimary">@color/game_primary</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+    </style>
+</resources>

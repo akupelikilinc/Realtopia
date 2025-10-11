@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Material Design 3 Colors -->
+    <color name="purple_80">#D0BCFF</color>
+    <color name="purple_grey_80">#CCC2DC</color>
+    <color name="pink_80">#EFB8C8</color>
+    
+    <color name="purple_40">#6650a4</color>
+    <color name="purple_grey_40">#625b71</color>
+    <color name="pink_40">#7D5260</color>
+    
+    <!-- Game Specific Colors -->
+    <color name="game_primary">#2196F3</color>
+    <color name="game_secondary">#4CAF50</color>
+    <color name="game_accent">#FF9800</color>
+    <color name="game_error">#F44336</color>
+    <color name="game_success">#4CAF50</color>
+    <color name="game_warning">#FFC107</color>
+    
+    <!-- Property Type Colors -->
+    <color name="house_color">#4CAF50</color>
+    <color name="shop_color">#2196F3</color>
+    <color name="apartment_color">#9C27B0</color>
+    <color name="office_color">#FF9800</color>
+    
+    <!-- Theme Background Colors -->
+    <color name="urban_background">#87CEEB</color>
+    <color name="beach_background">#87CEEB</color>
+    <color name="mountain_background">#E0E0E0</color>
+    <color name="forest_background">#2E7D32</color>
+    <color name="desert_background">#FF9800</color>
+    
+    <!-- Theme Ground Colors -->
+    <color name="urban_ground">#4CAF50</color>
+    <color name="beach_ground">#FFC107</color>
+    <color name="mountain_ground">#8D6E63</color>
+    <color name="forest_ground">#4CAF50</color>
+    <color name="desert_ground">#FFC107</color>
+    
+    <!-- Notification Colors -->
+    <color name="notification_color">#2196F3</color>
+    
+    <!-- Price Change Colors -->
+    <color name="price_increase">#4CAF50</color>
+    <color name="price_decrease">#F44336</color>
+    <color name="price_neutral">#9E9E9E</color>
+    
+    <!-- Achievement Colors -->
+    <color name="achievement_gold">#FFD700</color>
+    <color name="achievement_silver">#C0C0C0</color>
+    <color name="achievement_bronze">#CD7F32</color>
+    
+    <!-- Market Event Colors -->
+    <color name="market_boom">#4CAF50</color>
+    <color name="market_crash">#F44336</color>
+    <color name="market_real_estate">#2196F3</color>
+    <color name="market_business">#FF9800</color>
+    
+    <!-- City Map Colors -->
+    <color name="grass_green">#4CAF50</color>
+    <color name="light_green">#C8E6C9</color>
+    <color name="light_blue">#BBDEFB</color>
+    <color name="light_purple">#E1BEE7</color>
+    <color name="light_gold">#FFF9C4</color>
+</resources>

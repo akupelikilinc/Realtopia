@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- Include game progress and achievements -->
+        <include domain="database" path="realtopia_database"/>
+        <include domain="sharedpref" path="game_settings.xml"/>
+        <include domain="sharedpref" path="user_progress.xml"/>
+        
+        <!-- Exclude sensitive data -->
+        <exclude domain="sharedpref" path="user_credentials.xml"/>
+        <exclude domain="sharedpref" path="payment_info.xml"/>
+        <exclude domain="file" path="temp/"/>
+        <exclude domain="file" path="cache/"/>
+    </cloud-backup>
+    
+    <device-transfer>
+        <!-- Include all game data for device transfer -->
+        <include domain="database" path="realtopia_database"/>
+        <include domain="sharedpref" path="."/>
+        
+        <!-- Exclude only truly sensitive data -->
+        <exclude domain="sharedpref" path="user_credentials.xml"/>
+        <exclude domain="file" path="temp/"/>
+        <exclude domain="file" path="cache/"/>
+    </device-transfer>
+</data-extraction-rules>

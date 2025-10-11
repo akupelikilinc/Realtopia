@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Realtopia</string>
+    
+    <!-- Game UI -->
+    <string name="balance">Bakiye</string>
+    <string name="level">Seviye</string>
+    <string name="time_left">Süre</string>
+    <string name="pause">Duraklat</string>
+    <string name="resume">Devam Et</string>
+    <string name="restart">Yeniden Başlat</string>
+    <string name="close">Kapat</string>
+    
+    <!-- Property Types -->
+    <string name="property_house">Ev</string>
+    <string name="property_shop">Dükkan</string>
+    <string name="property_apartment">Apartman</string>
+    <string name="property_office">Ofis</string>
+    
+    <!-- Game Modes -->
+    <string name="game_mode_career">KARİYER</string>
+    <string name="game_mode_sandbox">SERBEST</string>
+    <string name="game_mode_challenge">MEYDAN OKUMA</string>
+    
+    <!-- Property Details -->
+    <string name="current_price">Mevcut Fiyat</string>
+    <string name="sell_price">Satış Fiyatı</string>
+    <string name="profit_loss">Kar/Zarar</string>
+    <string name="owned_properties">Mülkler</string>
+    <string name="portfolio">Portföy</string>
+    
+    <!-- Achievements -->
+    <string name="achievement_unlocked">BAŞARI AÇILDI!</string>
+    <string name="level_up">SEVİYE ATLANDI!</string>
+    <string name="bonus_reward">bonus!</string>
+    
+    <!-- Market Events -->
+    <string name="economic_boom">Ekonomik Patlama</string>
+    <string name="market_crash">Piyasa Çöküşü</string>
+    <string name="real_estate_boom">Emlak Patlaması</string>
+    <string name="business_growth">İş Dünyası Büyümesi</string>
+    <string name="time_remaining">Kalan</string>
+    
+    <!-- Themes -->
+    <string name="theme_urban">Şehir</string>
+    <string name="theme_beach">Sahil</string>
+    <string name="theme_mountain">Dağ</string>
+    <string name="theme_forest">Orman</string>
+    <string name="theme_desert">Çöl</string>
+    
+    <!-- Achievements -->
+    <string name="achievement_first_property">İlk Mülk</string>
+    <string name="achievement_first_property_desc">İlk mülkünü satın al</string>
+    <string name="achievement_property_mogul">Mülk Kralı</string>
+    <string name="achievement_property_mogul_desc">10 mülk satın al</string>
+    <string name="achievement_millionaire">Milyoner</string>
+    <string name="achievement_millionaire_desc">$10,000 bakiye elde et</string>
+    <string name="achievement_level_master">Seviye Ustası</string>
+    <string name="achievement_level_master_desc">Seviye 10\'a ulaş</string>
+    <string name="achievement_market_watcher">Piyasa İzleyicisi</string>
+    <string name="achievement_market_watcher_desc">5 piyasa olayını deneyimle</string>
+    <string name="achievement_profit_master">Kar Ustası</string>
+    <string name="achievement_profit_master_desc">$5,000 kar elde et</string>
+    <string name="achievement_portfolio_manager">Portföy Yöneticisi</string>
+    <string name="achievement_portfolio_manager_desc">$50,000 portföy değeri</string>
+    <string name="achievement_risk_taker">Risk Alıcı</string>
+    <string name="achievement_risk_taker_desc">%50 yatırım getirisi elde et</string>
+    
+    <!-- Google Play Games -->
+    <string name="games_app_id">YOUR_GAMES_APP_ID</string>
+    
+    <!-- Error Messages -->
+    <string name="error_insufficient_balance">Yetersiz bakiye</string>
+    <string name="error_property_not_found">Mülk bulunamadı</string>
+    <string name="error_property_already_owned">Mülk zaten sahip olunan</string>
+    <string name="error_property_not_owned">Mülk sahip olunmayan</string>
+    
+    <!-- Success Messages -->
+    <string name="success_property_purchased">Mülk satın alındı!</string>
+    <string name="success_property_sold">Mülk satıldı!</string>
+    <string name="success_achievement_unlocked">Başarı açıldı!</string>
+    <string name="success_level_up">Seviye atlandı!</string>
+</resources>
