@@ -34,6 +34,7 @@ fun MainMenuScreen(
     onNavigateToCareer: () -> Unit,
     onNavigateToTimeTrial: () -> Unit,
     onNavigateToEndless: () -> Unit,
+    onNavigateToMonopoly: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var isAnimating by remember { mutableStateOf(true) }
@@ -130,6 +131,14 @@ fun MainMenuScreen(
                     icon = Icons.Default.AllInclusive,
                     onClick = onNavigateToEndless,
                     color = EndlessColor
+                )
+                
+                GameModeButton(
+                    title = "GERÇEK MONOPOLY",
+                    subtitle = "Klasik Monopoly oyunu",
+                    icon = Icons.Default.Casino,
+                    onClick = onNavigateToMonopoly,
+                    color = Color(0xFF8BC34A)
                 )
             }
         }
