@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.realtopia.game.presentation.ui.screen.GameScreen
 import com.realtopia.game.presentation.ui.screen.MainMenuScreen
+import com.realtopia.game.presentation.ui.screen.SimpleMonopolyScreen
 
 @Composable
 fun RealtopiaNavigation(
@@ -19,15 +20,19 @@ fun RealtopiaNavigation(
         composable("main_menu") {
             MainMenuScreen(
                 onNavigateToCareer = {
-                    navController.navigate("game/career")
+                    navController.navigate("monopoly")
                 },
                 onNavigateToTimeTrial = {
-                    navController.navigate("game/time_trial")
+                    navController.navigate("monopoly")
                 },
                 onNavigateToEndless = {
-                    navController.navigate("game/endless")
+                    navController.navigate("monopoly")
                 }
             )
+        }
+        
+        composable("monopoly") {
+            SimpleMonopolyScreen()
         }
         
         composable("game/career") {
