@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
-import com.realtopia.game.presentation.ui.screen.GameScreen
+import com.realtopia.game.presentation.navigation.RealtopiaNavigation
 import com.realtopia.game.presentation.ui.theme.RealtopiaTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -24,9 +24,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             RealtopiaTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    GameScreen(
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    RealtopiaNavigation()
                 }
             }
         }

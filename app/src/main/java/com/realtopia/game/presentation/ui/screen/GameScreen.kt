@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.realtopia.game.data.model.Property
+import com.realtopia.game.presentation.navigation.GameMode
 import com.realtopia.game.presentation.ui.components.*
 import com.realtopia.game.presentation.ui.theme.*
 import com.realtopia.game.presentation.viewmodel.GameViewModel
@@ -24,6 +25,7 @@ import kotlinx.coroutines.delay
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameScreen(
+    gameMode: GameMode = GameMode.ENDLESS,
     modifier: Modifier = Modifier,
     viewModel: GameViewModel = hiltViewModel()
 ) {
@@ -48,22 +50,43 @@ fun GameScreen(
                 modifier = Modifier.fillMaxWidth()
             )
             
-            // Modern Map View
-            ModernMapView(
-                properties = properties,
-                onPropertyBuy = { property ->
-                    viewModel.buyProperty(property)
-                },
-                onPropertySell = { property ->
-                    viewModel.sellProperty(property)
-                },
-                canAffordProperty = { property ->
-                    gameState.canAffordProperty(property)
-                },
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-            )
+            // Map View based on game mode
+            when (gameMode) {
+                GameMode.CAREER, GameMode.TIME_TRIAL -> {
+                    IsometricMapView(
+                        properties = properties,
+                        onPropertyBuy = { property ->
+                            viewModel.buyProperty(property)
+                        },
+                        onPropertySell = { property ->
+                            viewModel.sellProperty(property)
+                        },
+                        canAffordProperty = { property ->
+                            gameState.canAffordProperty(property)
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    )
+                }
+                GameMode.ENDLESS -> {
+                    ModernMapView(
+                        properties = properties,
+                        onPropertyBuy = { property ->
+                            viewModel.buyProperty(property)
+                        },
+                        onPropertySell = { property ->
+                            viewModel.sellProperty(property)
+                        },
+                        canAffordProperty = { property ->
+                            gameState.canAffordProperty(property)
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    )
+                }
+            }
         }
         
         // Overlays
