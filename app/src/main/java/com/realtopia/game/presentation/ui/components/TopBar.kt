@@ -10,68 +10,54 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.realtopia.game.presentation.ui.theme.*
 
 @Composable
 fun TopBar(
     balance: Double,
-    level: Int,
-    timeLeft: Long,
-    isPaused: Boolean,
-    onPauseClick: () -> Unit,
+    portfolioValue: Double,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .shadow(4.dp, RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
             .background(
-                color = MaterialTheme.colorScheme.primaryContainer,
-                shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        MaterialTheme.colorScheme.primary,
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                    )
+                ),
+                shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)
             )
-            .padding(16.dp),
+            .padding(20.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Balance Panel
         InfoPanel(
-            icon = Icons.Default.AttachMoney,
+            icon = Icons.Default.AccountBalanceWallet,
             title = "Bakiye",
-            value = "$${balance.toInt()}",
-            color = MaterialTheme.colorScheme.primary
+            value = formatMoney(balance),
+            color = TextOnDark,
+            backgroundColor = BackgroundSecondary.copy(alpha = 0.2f)
         )
         
-        // Level Panel
+        // Portfolio Panel
         InfoPanel(
-            icon = Icons.Default.Star,
-            title = "Seviye",
-            value = level.toString(),
-            color = MaterialTheme.colorScheme.secondary
+            icon = Icons.Default.TrendingUp,
+            title = "Portföy",
+            value = formatMoney(portfolioValue),
+            color = TextOnDark,
+            backgroundColor = BackgroundSecondary.copy(alpha = 0.2f)
         )
-        
-        // Timer Panel
-        InfoPanel(
-            icon = Icons.Default.AccessTime,
-            title = "Süre",
-            value = formatTime(timeLeft),
-            color = if (timeLeft < 60000) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.tertiary
-        )
-        
-        // Pause Button
-        IconButton(
-            onClick = onPauseClick,
-            modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.surface)
-        ) {
-            Icon(
-                imageVector = if (isPaused) Icons.Default.PlayArrow else Icons.Default.Pause,
-                contentDescription = if (isPaused) "Devam Et" else "Duraklat",
-                tint = MaterialTheme.colorScheme.onSurface
-            )
-        }
     }
 }
 
@@ -81,45 +67,49 @@ private fun InfoPanel(
     title: String,
     value: String,
     color: Color,
+    backgroundColor: Color,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(color.copy(alpha = 0.1f))
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .clip(RoundedCornerShape(12.dp))
+            .background(backgroundColor)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Icon(
             imageVector = icon,
             contentDescription = title,
             tint = color,
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(24.dp)
         )
         
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.Start
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.labelSmall,
-                color = color.copy(alpha = 0.8f)
+                style = MaterialTheme.typography.labelMedium,
+                color = color.copy(alpha = 0.8f),
+                fontSize = 12.sp
             )
             Text(
                 text = value,
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    fontWeight = FontWeight.Bold
                 ),
-                color = color
+                color = color,
+                fontSize = 18.sp
             )
         }
     }
 }
 
-private fun formatTime(timeLeft: Long): String {
-    val minutes = (timeLeft / 60000).toInt()
-    val seconds = ((timeLeft % 60000) / 1000).toInt()
-    return String.format("%02d:%02d", minutes, seconds)
+private fun formatMoney(amount: Double): String {
+    return when {
+        amount >= 1000000 -> "₺${(amount / 1000000).toInt()}M"
+        amount >= 1000 -> "₺${(amount / 1000).toInt()}K"
+        else -> "₺${amount.toInt()}"
+    }
 }

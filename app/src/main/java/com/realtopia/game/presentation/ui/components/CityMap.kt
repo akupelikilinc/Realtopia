@@ -270,6 +270,9 @@ private fun getPropertyIcon(propertyType: Property.PropertyType): ImageVector {
         Property.PropertyType.SHOP -> Icons.Default.Store
         Property.PropertyType.APARTMENT -> Icons.Default.Apartment
         Property.PropertyType.OFFICE -> Icons.Default.Business
+        Property.PropertyType.VILLA -> Icons.Default.Villa
+        Property.PropertyType.PLAZA -> Icons.Default.BusinessCenter
+        Property.PropertyType.SKYSCRAPER -> Icons.Default.LocationCity
     }
 }
 
@@ -280,6 +283,9 @@ private fun getPropertyColor(propertyType: Property.PropertyType): Color {
         Property.PropertyType.SHOP -> ShopColor
         Property.PropertyType.APARTMENT -> ApartmentColor
         Property.PropertyType.OFFICE -> OfficeColor
+        Property.PropertyType.VILLA -> VillaColor
+        Property.PropertyType.PLAZA -> PlazaColor
+        Property.PropertyType.SKYSCRAPER -> SkyscraperColor
     }
 }
 

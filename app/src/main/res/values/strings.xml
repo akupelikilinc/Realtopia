@@ -67,7 +67,7 @@
     <string name="achievement_risk_taker_desc">%50 yatırım getirisi elde et</string>
     
     <!-- Google Play Games -->
-    <string name="games_app_id">YOUR_GAMES_APP_ID</string>
+    <string name="games_app_id">123456789</string>
     
     <!-- Error Messages -->
     <string name="error_insufficient_balance">Yetersiz bakiye</string>
@@ -80,4 +80,8 @@
     <string name="success_property_sold">Mülk satıldı!</string>
     <string name="success_achievement_unlocked">Başarı açıldı!</string>
     <string name="success_level_up">Seviye atlandı!</string>
+    
+    <!-- Notification -->
+    <string name="notification_title">Realtopia</string>
+    <string name="notification_text">Yeni mülk fırsatları!</string>
 </resources>

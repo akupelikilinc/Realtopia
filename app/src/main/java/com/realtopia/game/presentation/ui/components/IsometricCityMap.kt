@@ -276,6 +276,9 @@ private fun DrawScope.drawBuilding(
         Property.PropertyType.SHOP -> Color(0xFFE57373) // Light red
         Property.PropertyType.APARTMENT -> Color(0xFF90A4AE) // Gray
         Property.PropertyType.OFFICE -> Color(0xFF64B5F6) // Blue
+        Property.PropertyType.VILLA -> Color(0xFFBA68C8) // Purple
+        Property.PropertyType.PLAZA -> Color(0xFFFFD54F) // Yellow
+        Property.PropertyType.SKYSCRAPER -> Color(0xFF4FC3F7) // Light blue
     }
     
     val roofColor = when (property.type) {
@@ -283,6 +286,9 @@ private fun DrawScope.drawBuilding(
         Property.PropertyType.SHOP -> Color(0xFFD32F2F) // Red
         Property.PropertyType.APARTMENT -> Color(0xFF455A64) // Dark gray
         Property.PropertyType.OFFICE -> Color(0xFF1976D2) // Dark blue
+        Property.PropertyType.VILLA -> Color(0xFF8E24AA) // Dark purple
+        Property.PropertyType.PLAZA -> Color(0xFFF57F17) // Dark yellow
+        Property.PropertyType.SKYSCRAPER -> Color(0xFF0277BD) // Dark blue
     }
     
     // Draw building base (isometric)

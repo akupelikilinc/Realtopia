@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -26,8 +27,9 @@ import com.realtopia.game.presentation.ui.theme.*
 @Composable
 fun PropertyCard(
     property: Property,
-    onPropertyClick: () -> Unit,
-    onPropertyLongClick: () -> Unit,
+    onBuyClick: () -> Unit,
+    onSellClick: () -> Unit,
+    canAfford: Boolean,
     modifier: Modifier = Modifier
 ) {
     var isPressed by remember { mutableStateOf(false) }
@@ -38,96 +40,161 @@ fun PropertyCard(
         label = "scale"
     )
     
-    val borderColor = if (property.isOwned) {
-        GameSuccess
-    } else {
-        when (property.priceChange) {
-            in 0.0..Double.MAX_VALUE -> GameSuccess
-            in Double.MIN_VALUE..0.0 -> GameError
-            else -> MaterialTheme.colorScheme.outline
-        }
-    }
+    val propertyGradient = getPropertyGradient(property.type)
+    val propertyColor = getPropertyColor(property.type)
     
     Card(
         modifier = modifier
-            .size(80.dp)
+            .width(160.dp)
+            .height(200.dp)
             .scale(scale)
             .border(
-                width = 2.dp,
-                color = borderColor,
-                shape = RoundedCornerShape(12.dp)
-            )
-            .clickable(
-                onClick = {
-                    isPressed = true
-                    onPropertyClick()
-                }
+                width = if (property.isOwned) 3.dp else 1.dp,
+                color = if (property.isOwned) GameSuccess else CardBorder,
+                shape = RoundedCornerShape(16.dp)
             ),
-        colors = CardDefaults.cardColors(
-            containerColor = if (property.isOwned) {
-                GameSuccess.copy(alpha = 0.1f)
-            } else {
-                MaterialTheme.colorScheme.surface
-            }
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
+                .background(
+                    brush = Brush.verticalGradient(propertyGradient),
+                    shape = RoundedCornerShape(16.dp)
+                )
         ) {
-            // Property Icon
-            Icon(
-                imageVector = getPropertyIcon(property.type),
-                contentDescription = property.type.displayName,
-                tint = getPropertyColor(property.type),
-                modifier = Modifier.size(24.dp)
-            )
-            
-            // Price
-            Text(
-                text = "$${property.currentPrice.toInt()}",
-                style = MaterialTheme.typography.bodySmall.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 10.sp
-                ),
-                color = MaterialTheme.colorScheme.onSurface,
-                textAlign = TextAlign.Center,
-                maxLines = 1
-            )
-            
-            // Price Change Indicator
-            if (property.priceChange != 0.0) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                // Header
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        text = property.getPriceChangeIcon(),
-                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 8.sp),
-                        color = Color(android.graphics.Color.parseColor(property.getPriceChangeColor()))
+                    // Property Icon
+                    Icon(
+                        imageVector = getPropertyIcon(property.type),
+                        contentDescription = property.type.displayName,
+                        tint = TextOnDark,
+                        modifier = Modifier.size(32.dp)
                     )
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    // Property Name
                     Text(
-                        text = "${property.priceChangePercentage.toInt()}%",
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            fontSize = 8.sp,
+                        text = property.name,
+                        style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold
                         ),
-                        color = Color(android.graphics.Color.parseColor(property.getPriceChangeColor()))
+                        color = TextOnDark,
+                        textAlign = TextAlign.Center,
+                        maxLines = 2
                     )
+                    
+                    // Location
+                    Text(
+                        text = property.location.displayName,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = TextOnDark.copy(alpha = 0.8f),
+                        textAlign = TextAlign.Center
+                    )
+                }
+                
+                // Price Section
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Current Price
+                    Text(
+                        text = property.getFormattedPrice(),
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = TextOnDark,
+                        textAlign = TextAlign.Center
+                    )
+                    
+                    // Price Change
+                    if (property.priceChange != 0.0) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text(
+                                text = property.getPriceChangeIcon(),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = if (property.priceChange > 0) PriceUpColor else PriceDownColor
+                            )
+                            Text(
+                                text = property.getFormattedPriceChangePercentage(),
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontWeight = FontWeight.Bold
+                                ),
+                                color = if (property.priceChange > 0) PriceUpColor else PriceDownColor
+                            )
+                        }
+                    }
+                }
+                
+                // Action Button
+                if (property.isOwned) {
+                    Button(
+                        onClick = onSellClick,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(40.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = SellButtonColor
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = "SAT",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold
+                            ),
+                            color = TextOnDark
+                        )
+                    }
+                } else {
+                    Button(
+                        onClick = onBuyClick,
+                        enabled = canAfford,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(40.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (canAfford) BuyButtonColor else DisabledButtonColor
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = if (canAfford) "AL" else "YETERSİZ",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold
+                            ),
+                            color = TextOnDark
+                        )
+                    }
                 }
             }
             
-            // Ownership Indicator
+            // Ownership Badge
             if (property.isOwned) {
                 Icon(
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = "Sahip",
                     tint = GameSuccess,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier
+                        .size(24.dp)
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
                 )
             }
         }
@@ -144,19 +211,38 @@ fun PropertyCard(
 @Composable
 private fun getPropertyIcon(propertyType: Property.PropertyType): ImageVector {
     return when (propertyType) {
-        Property.PropertyType.HOUSE -> Icons.Default.Home
-        Property.PropertyType.SHOP -> Icons.Default.Store
         Property.PropertyType.APARTMENT -> Icons.Default.Apartment
+        Property.PropertyType.HOUSE -> Icons.Default.Home
+        Property.PropertyType.VILLA -> Icons.Default.Villa
+        Property.PropertyType.SHOP -> Icons.Default.Store
         Property.PropertyType.OFFICE -> Icons.Default.Business
+        Property.PropertyType.PLAZA -> Icons.Default.BusinessCenter
+        Property.PropertyType.SKYSCRAPER -> Icons.Default.LocationCity
     }
 }
 
 @Composable
 private fun getPropertyColor(propertyType: Property.PropertyType): Color {
     return when (propertyType) {
-        Property.PropertyType.HOUSE -> HouseColor
-        Property.PropertyType.SHOP -> ShopColor
         Property.PropertyType.APARTMENT -> ApartmentColor
+        Property.PropertyType.HOUSE -> HouseColor
+        Property.PropertyType.VILLA -> VillaColor
+        Property.PropertyType.SHOP -> ShopColor
         Property.PropertyType.OFFICE -> OfficeColor
+        Property.PropertyType.PLAZA -> PlazaColor
+        Property.PropertyType.SKYSCRAPER -> SkyscraperColor
+    }
+}
+
+@Composable
+private fun getPropertyGradient(propertyType: Property.PropertyType): List<Color> {
+    return when (propertyType) {
+        Property.PropertyType.APARTMENT -> ApartmentGradient
+        Property.PropertyType.HOUSE -> HouseGradient
+        Property.PropertyType.VILLA -> VillaGradient
+        Property.PropertyType.SHOP -> ShopGradient
+        Property.PropertyType.OFFICE -> OfficeGradient
+        Property.PropertyType.PLAZA -> PlazaGradient
+        Property.PropertyType.SKYSCRAPER -> SkyscraperGradient
     }
 }

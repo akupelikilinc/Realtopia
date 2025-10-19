@@ -5,56 +5,63 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class GameState(
-    val currentLevel: Int = 1,
-    val balance: Double = 35.0,
-    val missionTarget: Double = 1000.0,
-    val timeLeft: Long = 600000, // 10 minutes in milliseconds
-    val isPaused: Boolean = false,
-    val isGameOver: Boolean = false,
-    val gameMode: GameMode = GameMode.CAREER,
-    val levelProgress: Float = 0.0f,
+    val balance: Double = 10000.0, // 10K TL başlangıç
+    val portfolioValue: Double = 0.0,
     val totalPropertiesOwned: Int = 0,
     val totalPropertiesSold: Int = 0,
     val totalProfit: Double = 0.0,
-    val portfolioValue: Double = 0.0,
-    val currentTheme: LevelTheme = LevelTheme.URBAN
+    val unlockedPropertyTypes: Set<Property.PropertyType> = setOf(Property.PropertyType.APARTMENT),
+    val isGamePaused: Boolean = false
 ) : Parcelable {
     
+    enum class LevelTheme {
+        URBAN,
+        SUBURBAN,
+        COASTAL,
+        MOUNTAIN,
+        DESERT
+    }
+    
     enum class GameMode {
-        CAREER, SANDBOX, CHALLENGE
-    }
-    
-    enum class LevelTheme(
-        val displayName: String,
-        val backgroundColor: String,
-        val groundColor: String
-    ) {
-        URBAN("Şehir", "#87CEEB", "#4CAF50"),
-        BEACH("Sahil", "#87CEEB", "#FFC107"),
-        MOUNTAIN("Dağ", "#E0E0E0", "#8D6E63"),
-        FOREST("Orman", "#2E7D32", "#4CAF50"),
-        DESERT("Çöl", "#FF9800", "#FFC107")
-    }
-    
-    fun getLevelProgressPercentage(): Float {
-        return (balance / missionTarget).toFloat().coerceAtMost(1.0f)
-    }
-    
-    fun isMissionCompleted(): Boolean {
-        return balance >= missionTarget
-    }
-    
-    fun getTimeLeftFormatted(): String {
-        val minutes = (timeLeft / 60000).toInt()
-        val seconds = ((timeLeft % 60000) / 1000).toInt()
-        return String.format("%02d:%02d", minutes, seconds)
+        CAREER,
+        SANDBOX,
+        CHALLENGE
     }
     
     fun getBalanceFormatted(): String {
-        return "$${balance.toInt()}"
+        return when {
+            balance >= 1000000 -> "₺${(balance / 1000000).toInt()}M"
+            balance >= 1000 -> "₺${(balance / 1000).toInt()}K"
+            else -> "₺${balance.toInt()}"
+        }
     }
     
-    fun getMissionTargetFormatted(): String {
-        return "$${missionTarget.toInt()}"
+    fun getPortfolioValueFormatted(): String {
+        return when {
+            portfolioValue >= 1000000 -> "₺${(portfolioValue / 1000000).toInt()}M"
+            portfolioValue >= 1000 -> "₺${(portfolioValue / 1000).toInt()}K"
+            else -> "₺${portfolioValue.toInt()}"
+        }
+    }
+    
+    fun getTotalProfitFormatted(): String {
+        val sign = if (totalProfit >= 0) "+" else ""
+        return when {
+            kotlin.math.abs(totalProfit) >= 1000000 -> "$sign₺${(kotlin.math.abs(totalProfit) / 1000000).toInt()}M"
+            kotlin.math.abs(totalProfit) >= 1000 -> "$sign₺${(kotlin.math.abs(totalProfit) / 1000).toInt()}K"
+            else -> "$sign₺${kotlin.math.abs(totalProfit).toInt()}"
+        }
+    }
+    
+    fun canAffordProperty(property: Property): Boolean {
+        return balance >= property.currentPrice
+    }
+    
+    fun getNextUnlockablePropertyType(): Property.PropertyType? {
+        val allTypes = Property.PropertyType.values()
+        val currentIndex = allTypes.indexOfFirst { it in unlockedPropertyTypes }
+        return if (currentIndex >= 0 && currentIndex < allTypes.size - 1) {
+            allTypes[currentIndex + 1]
+        } else null
     }
 }

@@ -38,10 +38,11 @@ fun PropertyDetailsDialog(
             modifier = modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            )
+                containerColor = BackgroundSecondary
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
@@ -63,19 +64,19 @@ fun PropertyDetailsDialog(
                     style = MaterialTheme.typography.headlineSmall.copy(
                         fontWeight = FontWeight.Bold
                     ),
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = TextPrimary
                 )
                 
                 Spacer(modifier = Modifier.height(8.dp))
                 
-                // Property Type
+                // Property Type & Location
                 Text(
-                    text = property.type.displayName,
+                    text = "${property.type.displayName} • ${property.location.displayName}",
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    color = TextSecondary
                 )
                 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(20.dp))
                 
                 // Price Information
                 Row(
@@ -86,14 +87,14 @@ fun PropertyDetailsDialog(
                         Text(
                             text = "Mevcut Fiyat",
                             style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                            color = TextSecondary
                         )
                         Text(
-                            text = "$${property.currentPrice.toInt()}",
-                            style = MaterialTheme.typography.titleMedium.copy(
+                            text = property.getFormattedPrice(),
+                            style = MaterialTheme.typography.titleLarge.copy(
                                 fontWeight = FontWeight.Bold
                             ),
-                            color = MaterialTheme.colorScheme.primary
+                            color = GamePrimary
                         )
                     }
                     
@@ -101,11 +102,11 @@ fun PropertyDetailsDialog(
                         Text(
                             text = "Satış Fiyatı",
                             style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                            color = TextSecondary
                         )
                         Text(
-                            text = "$${property.sellPrice.toInt()}",
-                            style = MaterialTheme.typography.titleMedium.copy(
+                            text = property.getFormattedPrice(),
+                            style = MaterialTheme.typography.titleLarge.copy(
                                 fontWeight = FontWeight.Bold
                             ),
                             color = GameSecondary
@@ -124,15 +125,15 @@ fun PropertyDetailsDialog(
                         Text(
                             text = property.getPriceChangeIcon(),
                             style = MaterialTheme.typography.titleLarge,
-                            color = Color(android.graphics.Color.parseColor(property.getPriceChangeColor()))
+                            color = if (property.priceChange > 0) PriceUpColor else PriceDownColor
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "${property.priceChangePercentage.toInt()}%",
+                            text = property.getFormattedPriceChangePercentage(),
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold
                             ),
-                            color = Color(android.graphics.Color.parseColor(property.getPriceChangeColor()))
+                            color = if (property.priceChange > 0) PriceUpColor else PriceDownColor
                         )
                     }
                     
@@ -147,12 +148,12 @@ fun PropertyDetailsDialog(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(8.dp))
+                            .clip(RoundedCornerShape(12.dp))
                             .background(
                                 if (profit >= 0) GameSuccess.copy(alpha = 0.1f) 
                                 else GameError.copy(alpha = 0.1f)
                             )
-                            .padding(12.dp),
+                            .padding(16.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -160,10 +161,10 @@ fun PropertyDetailsDialog(
                             Text(
                                 text = "Kar/Zarar",
                                 style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                                color = TextSecondary
                             )
                             Text(
-                                text = "$${profit.toInt()}",
+                                text = property.getFormattedPriceChange(),
                                 style = MaterialTheme.typography.titleMedium.copy(
                                     fontWeight = FontWeight.Bold
                                 ),
@@ -180,18 +181,27 @@ fun PropertyDetailsDialog(
                         )
                     }
                     
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
                 }
                 
                 // Action Button
                 Button(
                     onClick = onDismiss,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    )
+                        containerColor = GamePrimary
+                    ),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Kapat")
+                    Text(
+                        text = "Kapat",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = TextOnDark
+                    )
                 }
             }
         }
@@ -228,42 +238,45 @@ fun AchievementNotification(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
-                containerColor = GameSuccess.copy(alpha = 0.9f)
-            )
+                containerColor = GameSuccess
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
         ) {
             Row(
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(20.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     imageVector = Icons.Default.EmojiEvents,
                     contentDescription = "Başarı",
-                    tint = Color.White,
-                    modifier = Modifier.size(32.dp)
+                    tint = TextOnDark,
+                    modifier = Modifier.size(36.dp)
                 )
                 
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(16.dp))
                 
                 Column {
                     Text(
                         text = "BAŞARI AÇILDI!",
-                        style = MaterialTheme.typography.titleMedium.copy(
+                        style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.Bold
                         ),
-                        color = Color.White
+                        color = TextOnDark
                     )
                     Text(
                         text = achievement.title,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.9f)
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = TextOnDark.copy(alpha = 0.9f)
                     )
                     if (achievement.rewardAmount > 0) {
                         Text(
-                            text = "+$${achievement.rewardAmount.toInt()} bonus!",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color.White.copy(alpha = 0.8f)
+                            text = "+₺${achievement.rewardAmount.toInt()} bonus!",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.Medium
+                            ),
+                            color = TextOnDark.copy(alpha = 0.8f)
                         )
                     }
                 }
@@ -302,39 +315,42 @@ fun MarketEventNotification(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color(android.graphics.Color.parseColor(event.color)).copy(alpha = 0.9f)
-            )
+                containerColor = Color(android.graphics.Color.parseColor(event.color))
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
         ) {
             Row(
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(20.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = event.icon,
-                    style = MaterialTheme.typography.headlineMedium
+                    style = MaterialTheme.typography.headlineLarge
                 )
                 
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(16.dp))
                 
                 Column {
                     Text(
                         text = event.name,
-                        style = MaterialTheme.typography.titleMedium.copy(
+                        style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.Bold
                         ),
-                        color = Color.White
+                        color = TextOnDark
                     )
                     Text(
                         text = event.description,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.9f)
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = TextOnDark.copy(alpha = 0.9f)
                     )
                     Text(
                         text = "Kalan: ${event.getTimeRemainingFormatted()}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.White.copy(alpha = 0.8f)
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.Medium
+                        ),
+                        color = TextOnDark.copy(alpha = 0.8f)
                     )
                 }
             }
@@ -414,19 +430,25 @@ fun LevelUpNotification(
 @Composable
 private fun getPropertyIcon(propertyType: Property.PropertyType): androidx.compose.ui.graphics.vector.ImageVector {
     return when (propertyType) {
-        Property.PropertyType.HOUSE -> Icons.Default.Home
-        Property.PropertyType.SHOP -> Icons.Default.Store
         Property.PropertyType.APARTMENT -> Icons.Default.Apartment
+        Property.PropertyType.HOUSE -> Icons.Default.Home
+        Property.PropertyType.VILLA -> Icons.Default.Villa
+        Property.PropertyType.SHOP -> Icons.Default.Store
         Property.PropertyType.OFFICE -> Icons.Default.Business
+        Property.PropertyType.PLAZA -> Icons.Default.BusinessCenter
+        Property.PropertyType.SKYSCRAPER -> Icons.Default.LocationCity
     }
 }
 
 @Composable
 private fun getPropertyColor(propertyType: Property.PropertyType): Color {
     return when (propertyType) {
-        Property.PropertyType.HOUSE -> HouseColor
-        Property.PropertyType.SHOP -> ShopColor
         Property.PropertyType.APARTMENT -> ApartmentColor
+        Property.PropertyType.HOUSE -> HouseColor
+        Property.PropertyType.VILLA -> VillaColor
+        Property.PropertyType.SHOP -> ShopColor
         Property.PropertyType.OFFICE -> OfficeColor
+        Property.PropertyType.PLAZA -> PlazaColor
+        Property.PropertyType.SKYSCRAPER -> SkyscraperColor
     }
 }

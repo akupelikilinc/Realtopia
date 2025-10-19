@@ -31,6 +31,7 @@ interface GameRepository {
     fun getUnlockedAchievements(): Flow<List<Achievement>>
     suspend fun updateAchievementProgress(type: Achievement.AchievementType, value: Double)
     suspend fun unlockAchievement(achievementId: String)
+    suspend fun initializeAchievements()
     
     // Level System
     suspend fun getCurrentLevel(): Int

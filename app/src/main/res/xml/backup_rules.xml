@@ -1,19 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <full-backup-content>
-    <!-- Include game data -->
-    <include domain="database" path="realtopia_database"/>
-    
-    <!-- Include shared preferences -->
-    <include domain="sharedpref" path="realtopia_preferences"/>
-    
-    <!-- Exclude sensitive data -->
-    <exclude domain="sharedpref" path="user_credentials.xml"/>
-    <exclude domain="sharedpref" path="payment_info.xml"/>
-    
-    <!-- Exclude temporary files -->
-    <exclude domain="file" path="temp/"/>
-    <exclude domain="file" path="cache/"/>
-    
-    <!-- Exclude logs -->
-    <exclude domain="file" path="logs/"/>
+    <include domain="sharedpref" path="." />
+    <exclude domain="sharedpref" path="device.xml" />
 </full-backup-content>

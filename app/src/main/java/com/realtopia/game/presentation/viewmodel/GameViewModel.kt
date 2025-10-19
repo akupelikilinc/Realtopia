@@ -34,7 +34,6 @@ class GameViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
     
-    private var gameTimerJob: Job? = null
     private var marketUpdateJob: Job? = null
     
     data class UiState(
@@ -43,12 +42,11 @@ class GameViewModel @Inject constructor(
         val showPropertyDetails: Property? = null,
         val showAchievementNotification: Achievement? = null,
         val showMarketEventNotification: MarketEvent? = null,
-        val showLevelUpNotification: Int? = null
+        val showUnlockNotification: Property.PropertyType? = null
     )
     
     init {
         initializeGame()
-        startGameTimer()
         startMarketUpdates()
         observeData()
     }
@@ -59,10 +57,7 @@ class GameViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(isLoading = true)
                 
                 // Initialize achievements if empty
-                val existingAchievements = gameRepository.getAllAchievements().first()
-                if (existingAchievements.isEmpty()) {
-                    // This would be handled in the repository initialization
-                }
+                gameRepository.initializeAchievements()
                 
                 // Generate properties if empty
                 gameRepository.generateNewProperties()
@@ -121,61 +116,68 @@ class GameViewModel @Inject constructor(
         }
     }
     
-    private fun startGameTimer() {
-        gameTimerJob = viewModelScope.launch {
+    
+    private fun startMarketUpdates() {
+        marketUpdateJob = viewModelScope.launch {
             while (true) {
-                delay(1000) // Update every second
+                delay(4000) // Update every 4 seconds
                 
-                val currentState = _gameState.value
-                if (!currentState.isPaused && !currentState.isGameOver && currentState.timeLeft > 0) {
-                    val newTimeLeft = currentState.timeLeft - 1000
-                    val newGameState = currentState.copy(timeLeft = newTimeLeft)
-                    
-                    if (newTimeLeft <= 0) {
-                        // Game over
-                        val gameOverState = newGameState.copy(
-                            timeLeft = 0,
-                            isGameOver = true
-                        )
-                        _gameState.value = gameOverState
-                        gameRepository.updateGameState(gameOverState)
-                    } else {
-                        _gameState.value = newGameState
-                        gameRepository.updateGameState(newGameState)
-                    }
+                if (!_gameState.value.isGamePaused) {
+                    gameRepository.updateMarketPrices()
+                    gameRepository.triggerMarketEvent()
+                    updatePortfolioValue()
                 }
             }
         }
     }
     
-    private fun startMarketUpdates() {
-        marketUpdateJob = viewModelScope.launch {
-            while (true) {
-                delay(5000) // Update every 5 seconds
-                
-                if (!_gameState.value.isPaused && !_gameState.value.isGameOver) {
-                    gameRepository.updateMarketPrices()
-                    gameRepository.triggerMarketEvent()
-                }
-            }
-        }
+    private fun updatePortfolioValue() {
+        val ownedProperties = _ownedProperties.value
+        val totalValue = ownedProperties.sumOf { it.currentPrice }
+        val currentState = _gameState.value
+        _gameState.value = currentState.copy(portfolioValue = totalValue)
     }
     
     fun buyProperty(property: Property) {
         viewModelScope.launch {
             try {
-                val result = gameRepository.buyProperty(property.id)
-                result.onSuccess { updatedProperty ->
-                    // Check for level up
-                    if (gameRepository.checkLevelUp()) {
-                        val newLevel = gameRepository.getCurrentLevel()
-                        _uiState.value = _uiState.value.copy(showLevelUpNotification = newLevel)
+                val currentState = _gameState.value
+                if (currentState.canAffordProperty(property)) {
+                    val result = gameRepository.buyProperty(property.id)
+                    result.onSuccess { updatedProperty ->
+                        val newBalance = currentState.balance - property.currentPrice
+                        val newOwnedCount = currentState.totalPropertiesOwned + 1
+                        val newState = currentState.copy(
+                            balance = newBalance,
+                            totalPropertiesOwned = newOwnedCount
+                        )
+                        _gameState.value = newState
+                        gameRepository.updateGameState(newState)
+                        
+                        // Check for property type unlock
+                        checkForPropertyUnlock(property.type)
+                    }.onFailure { error ->
+                        _uiState.value = _uiState.value.copy(error = error.message)
                     }
-                }.onFailure { error ->
-                    _uiState.value = _uiState.value.copy(error = error.message)
+                } else {
+                    _uiState.value = _uiState.value.copy(error = "Yetersiz bakiye!")
                 }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(error = e.message)
+            }
+        }
+    }
+    
+    private fun checkForPropertyUnlock(propertyType: Property.PropertyType) {
+        viewModelScope.launch {
+            val currentState = _gameState.value
+            val nextUnlockable = currentState.getNextUnlockablePropertyType()
+            if (nextUnlockable != null && currentState.balance >= nextUnlockable.basePrice) {
+                val newUnlockedTypes = currentState.unlockedPropertyTypes + nextUnlockable
+                val newState = currentState.copy(unlockedPropertyTypes = newUnlockedTypes)
+                _gameState.value = newState
+                gameRepository.updateGameState(newState)
+                _uiState.value = _uiState.value.copy(showUnlockNotification = nextUnlockable)
             }
         }
     }
@@ -185,11 +187,18 @@ class GameViewModel @Inject constructor(
             try {
                 val result = gameRepository.sellProperty(property.id)
                 result.onSuccess { updatedProperty ->
-                    // Check for level up
-                    if (gameRepository.checkLevelUp()) {
-                        val newLevel = gameRepository.getCurrentLevel()
-                        _uiState.value = _uiState.value.copy(showLevelUpNotification = newLevel)
-                    }
+                    val currentState = _gameState.value
+                    val profit = property.currentPrice - property.price
+                    val newBalance = currentState.balance + property.currentPrice
+                    val newSoldCount = currentState.totalPropertiesSold + 1
+                    val newTotalProfit = currentState.totalProfit + profit
+                    val newState = currentState.copy(
+                        balance = newBalance,
+                        totalPropertiesSold = newSoldCount,
+                        totalProfit = newTotalProfit
+                    )
+                    _gameState.value = newState
+                    gameRepository.updateGameState(newState)
                 }.onFailure { error ->
                     _uiState.value = _uiState.value.copy(error = error.message)
                 }
@@ -202,7 +211,7 @@ class GameViewModel @Inject constructor(
     fun pauseGame() {
         viewModelScope.launch {
             val currentState = _gameState.value
-            val newState = currentState.copy(isPaused = !currentState.isPaused)
+            val newState = currentState.copy(isGamePaused = !currentState.isGamePaused)
             _gameState.value = newState
             gameRepository.updateGameState(newState)
         }
@@ -231,8 +240,8 @@ class GameViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(showMarketEventNotification = null)
     }
     
-    fun hideLevelUpNotification() {
-        _uiState.value = _uiState.value.copy(showLevelUpNotification = null)
+    fun hideUnlockNotification() {
+        _uiState.value = _uiState.value.copy(showUnlockNotification = null)
     }
     
     fun clearError() {
@@ -241,7 +250,6 @@ class GameViewModel @Inject constructor(
     
     override fun onCleared() {
         super.onCleared()
-        gameTimerJob?.cancel()
         marketUpdateJob?.cancel()
     }
 }

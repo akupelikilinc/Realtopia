@@ -40,7 +40,17 @@ class GameRepositoryImpl @Inject constructor(
         _activeMarketEvents.value = emptyList()
         _marketTrend.value = 0.02
         propertyDao.deleteAllProperties()
+        achievementDao.deleteAllAchievements()
         generateNewProperties()
+        initializeAchievements()
+    }
+    
+    override suspend fun initializeAchievements() {
+        val existingAchievements = achievementDao.getAllAchievements().first()
+        if (existingAchievements.isEmpty()) {
+            val defaultAchievements = Achievement.getDefaultAchievements()
+            achievementDao.insertAchievements(defaultAchievements)
+        }
     }
     
     override fun getAllProperties(): Flow<List<Property>> = propertyDao.getAllProperties()
@@ -126,28 +136,32 @@ class GameRepositoryImpl @Inject constructor(
     
     override suspend fun generateNewProperties() {
         val properties = mutableListOf<Property>()
-        val gridSize = 8
+        val propertyNames = listOf(
+            "Merkez Plaza", "Sahil Villası", "İş Merkezi", "Garden Apartments", "Golden Tower",
+            "Coastal View", "Business Center", "Modern Loft", "Luxury Villa", "City Office",
+            "Beach House", "Downtown Plaza", "Sky Garden", "Executive Suite", "Ocean View",
+            "Metro Station", "Shopping Mall", "Tech Hub", "Residential Complex", "Commercial Tower"
+        )
         
-        for (x in 0 until gridSize) {
-            for (y in 0 until gridSize) {
-                if (Random.nextFloat() < 0.7f) { // 70% chance to place property
-                    val propertyType = Property.PropertyType.values().random()
-                    val basePrice = propertyType.basePrice
-                    val priceVariation = Random.nextDouble(0.5, 1.5)
-                    val price = basePrice * priceVariation
-                    
-                    val property = Property(
-                        name = "${propertyType.displayName} (${x},${y})",
-                        type = propertyType,
-                        price = price,
-                        currentPrice = price,
-                        sellPrice = price * 0.8,
-                        gridX = x,
-                        gridY = y
-                    )
-                    properties.add(property)
-                }
-            }
+        // Generate 18 properties with different types and locations
+        repeat(18) { index ->
+            val propertyType = Property.PropertyType.values().random()
+            val location = Property.Location.values().random()
+            val basePrice = propertyType.basePrice * location.priceMultiplier
+            val priceVariation = Random.nextDouble(0.8, 1.3)
+            val price = basePrice * priceVariation
+            
+            val property = Property(
+                name = propertyNames[index % propertyNames.size],
+                type = propertyType,
+                price = price,
+                currentPrice = price,
+                sellPrice = price * 0.95, // 5% commission
+                gridX = index % 3,
+                gridY = index / 3,
+                location = location
+            )
+            properties.add(property)
         }
         
         propertyDao.insertProperties(properties)
@@ -168,17 +182,19 @@ class GameRepositoryImpl @Inject constructor(
         val currentTrend = marketTrend.value
         
         properties.forEach { property ->
-            if (!property.isOwned) {
-                val volatility = property.type.riskLevel
-                val randomChange = Random.nextDouble(-volatility.toDouble(), volatility.toDouble())
-                val trendEffect = currentTrend * getTrendMultiplier(property.type)
-                
-                val newPrice = property.currentPrice * (1 + randomChange + trendEffect)
-                val minPrice = property.price * 0.1 // Minimum 10% of original price
-                val finalPrice = maxOf(newPrice, minPrice)
-                
-                updatePropertyPrice(property.id, finalPrice)
-            }
+            val volatility = property.type.riskLevel
+            val randomChange = Random.nextDouble(-volatility.toDouble(), volatility.toDouble())
+            val trendEffect = currentTrend * getTrendMultiplier(property.type)
+            
+            // Apply market events
+            val eventMultiplier = getActiveEventMultiplier(property.type)
+            
+            val newPrice = property.currentPrice * (1 + randomChange + trendEffect) * eventMultiplier
+            val minPrice = property.type.basePrice * 0.3 // Minimum 30% of base price
+            val maxPrice = property.type.maxPrice * 2.0 // Maximum 200% of max price
+            val finalPrice = newPrice.coerceIn(minPrice, maxPrice)
+            
+            updatePropertyPrice(property.id, finalPrice)
         }
         
         // Check for expired market events
@@ -188,14 +204,28 @@ class GameRepositoryImpl @Inject constructor(
         }
     }
     
+    private fun getActiveEventMultiplier(propertyType: Property.PropertyType): Double {
+        val activeEvents = activeMarketEvents.value.filter { !it.isExpired() }
+        return activeEvents.fold(1.0) { multiplier, event ->
+            if (propertyType in event.affectedPropertyTypes) {
+                multiplier * event.priceMultiplier
+            } else {
+                multiplier
+            }
+        }
+    }
+    
     override suspend fun getMarketTrend(): Double = marketTrend.value
     
     private fun getTrendMultiplier(propertyType: Property.PropertyType): Double {
         return when (propertyType) {
-            Property.PropertyType.HOUSE -> 1.0
-            Property.PropertyType.SHOP -> 1.2
-            Property.PropertyType.APARTMENT -> 1.1
-            Property.PropertyType.OFFICE -> 1.3
+            Property.PropertyType.APARTMENT -> 1.0
+            Property.PropertyType.HOUSE -> 1.1
+            Property.PropertyType.VILLA -> 1.2
+            Property.PropertyType.SHOP -> 1.3
+            Property.PropertyType.OFFICE -> 1.4
+            Property.PropertyType.PLAZA -> 1.5
+            Property.PropertyType.SKYSCRAPER -> 1.6
         }
     }
     
@@ -227,49 +257,15 @@ class GameRepositoryImpl @Inject constructor(
         }
     }
     
-    override suspend fun getCurrentLevel(): Int = gameState.value.currentLevel
+    override suspend fun getCurrentLevel(): Int = 1 // Simplified - no level system
     
-    override suspend fun getLevelProgress(): Float = gameState.value.getLevelProgressPercentage()
+    override suspend fun getLevelProgress(): Float = 0.0f // Simplified - no level system
     
-    override suspend fun getRequiredBalanceForNextLevel(): Double {
-        val currentLevel = gameState.value.currentLevel
-        return 1000.0 * Math.pow(1.5, currentLevel.toDouble())
-    }
+    override suspend fun getRequiredBalanceForNextLevel(): Double = 0.0 // Simplified - no level system
     
-    override suspend fun checkLevelUp(): Boolean {
-        val currentState = gameState.value
-        val requiredBalance = getRequiredBalanceForNextLevel()
-        
-        if (currentState.balance >= requiredBalance) {
-            val newLevel = currentState.currentLevel + 1
-            val newTheme = getThemeForLevel(newLevel)
-            val newGameState = currentState.copy(
-                currentLevel = newLevel,
-                currentTheme = newTheme,
-                levelProgress = 0.0f
-            )
-            _gameState.value = newGameState
-            
-            // Update achievement
-            updateAchievementProgress(Achievement.AchievementType.LEVEL_REACHED, newLevel.toDouble())
-            
-            return true
-        }
-        return false
-    }
+    override suspend fun checkLevelUp(): Boolean = false // Simplified - no level system
     
-    override suspend fun getCurrentTheme(): GameState.LevelTheme = gameState.value.currentTheme
-    
-    private fun getThemeForLevel(level: Int): GameState.LevelTheme {
-        return when (level % 5) {
-            1 -> GameState.LevelTheme.URBAN
-            2 -> GameState.LevelTheme.BEACH
-            3 -> GameState.LevelTheme.MOUNTAIN
-            4 -> GameState.LevelTheme.FOREST
-            0 -> GameState.LevelTheme.DESERT
-            else -> GameState.LevelTheme.URBAN
-        }
-    }
+    override suspend fun getCurrentTheme(): GameState.LevelTheme = GameState.LevelTheme.URBAN // Simplified - no theme system
     
     override suspend fun getTotalBalance(): Double = gameState.value.balance
     

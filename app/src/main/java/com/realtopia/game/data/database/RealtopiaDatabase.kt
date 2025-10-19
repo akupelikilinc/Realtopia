@@ -10,7 +10,7 @@ import com.realtopia.game.data.model.Property
 
 @Database(
     entities = [Property::class, Achievement::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
